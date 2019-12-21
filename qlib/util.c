@@ -107,18 +107,21 @@ int recv_rep(int nl_sock, unsigned char * buf, int nlseq)
 	return tot_len;
 }
 
-void parse_route(struct nlmsghdr * nlmsg, void * gw)
+int parse_route(struct nlmsghdr * nlmsg, void * gw)
 {
 	struct rtmsg * rtmsg;
 	struct rtattr * attr;
-	int len;
+	int len, index;
 	unsigned int ip;
+	char ** ref = (char **)gw;
 
 	static int cnt = 1;
+	
+	index = *((int *)ref[0]);
 
 	rtmsg = (struct rtmsg *)(NLMSG_DATA(nlmsg));
 	if (rtmsg->rtm_family != PF_INET || rtmsg->rtm_table != RT_TABLE_MAIN)
-		return;
+		return -1;
 
 	attr = (struct rtattr *)(RTM_RTA(rtmsg));
 	len = RTM_PAYLOAD(nlmsg);
@@ -129,23 +132,37 @@ void parse_route(struct nlmsghdr * nlmsg, void * gw)
 			continue;
 
 		ip = *(unsigned int *)(RTA_DATA(attr));
+
+		if (index == cnt)
+		{
+			cnt = 1;
+			memcpy(ref[1], &ip, sizeof(ip));
+			return 0;
+		}
+		else
+		{
+			cnt += 1;
+			break;
+		}
+
 		printf("%d, %s\n", cnt++, inet_ntoa(*(struct in_addr *)&ip));
 	}
+
+	return cnt;
 }
 
-void parse_neigh(struct nlmsghdr * nlmsg, void * gw)
+int parse_neigh(struct nlmsghdr * nlmsg, void * gw)
 {
 	struct ndmsg * ndmsg;
 	struct rtattr * attr;
 	int len;
 	unsigned int ip;
 	unsigned char mac[6];
-
-	static int cnt = 1;
+	char ** ref = (char **)gw;
 
 	ndmsg = (struct ndmsg *)(NLMSG_DATA(nlmsg));
 	if (ndmsg->ndm_family != PF_INET)
-		return;
+		return -1;
 
 	attr = (struct rtattr *)(RTM_RTA(ndmsg));
 	len = RTM_PAYLOAD(nlmsg);
@@ -155,31 +172,37 @@ void parse_neigh(struct nlmsghdr * nlmsg, void * gw)
 		if (attr->rta_type == NDA_LLADDR) //Link-Layer ADDRess
 		{
 			memcpy(mac, RTA_DATA(attr), 6);
-			printf("%d, %02x:%02x:%02x:%02x:%02x:%02x\n", cnt,
-				mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+			//printf("%d, %02x:%02x:%02x:%02x:%02x:%02x\n", cnt,
+				//mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 		}
 
 		if (attr->rta_type == NDA_DST) //DeSTinsation
 		{
 			ip = *(unsigned int *)(RTA_DATA(attr));
-			printf("%d, %s\n", cnt, inet_ntoa(*(struct in_addr *)&ip));
+			//printf("%d, %s\n", cnt, inet_ntoa(*(struct in_addr *)&ip));
 		}
 	}
 
-	cnt++;
+	if (*((unsigned int *)ref[1]) == ip)
+	{
+		memcpy(ref[2], mac, sizeof(mac));
+		return 0;
+	}
+	
+	return 1;
 }
 
 void parse_rep(unsigned char * buf, int tot_len, void * arg,
-		void (parse)(struct nlmsghdr *, void *))
+		int (parse)(struct nlmsghdr *, void *))
 {
 	struct nlmsghdr * nlmsg;
-	struct rtmsg * rtmsg;
-	struct ndmsg * ndmsg;
-	struct rtattr * attr;
 
 	nlmsg = (struct nlmsghdr *)buf;
 	for (; NLMSG_OK(nlmsg, tot_len); nlmsg = NLMSG_NEXT(nlmsg, tot_len))
-		parse(nlmsg, arg);
+	{
+		if (!parse(nlmsg, arg))
+			break;
+	}
 }
 
 int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
@@ -187,6 +210,11 @@ int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
 	int nl_sock;
 	int nlseq = 0, msg_len = 0;
 	unsigned char buf[NETLINK_BUFSIZE];
+	void * ref[] = {&ifindex, ip, mac};
+
+	if (!ip || !mac)
+		return -1;
+	ifindex -= 1;
 	
 	nl_sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
 	if (nl_sock < 0)
@@ -197,7 +225,7 @@ int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
 		goto err;
 	if ((msg_len = recv_rep(nl_sock, buf, nlseq)) < 0)
 		goto err;
-	parse_rep(buf, msg_len, ip, parse_route);
+	parse_rep(buf, msg_len, ref, parse_route);
 
 	puts("");
 	
@@ -206,7 +234,7 @@ int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
 		goto err;
 	if ((msg_len = recv_rep(nl_sock, buf, nlseq)) < 0)
 		goto err;
-	parse_rep(buf, msg_len, mac, parse_neigh);
+	parse_rep(buf, msg_len, ref, parse_neigh);
 
 	close(nl_sock);
 	return 0;
