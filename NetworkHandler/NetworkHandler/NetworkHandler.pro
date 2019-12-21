@@ -17,10 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    nic.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    nic.h
 
 FORMS += \
     mainwindow.ui
@@ -35,3 +37,5 @@ unix:!macx: LIBS += -L$$PWD/../../qlib/ -lutil
 
 INCLUDEPATH += $$PWD/../../qlib
 DEPENDPATH += $$PWD/../../qlib
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libutil.a

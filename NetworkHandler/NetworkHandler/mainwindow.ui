@@ -13,14 +13,64 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QListWidget" name="list_nic">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>191</width>
+      <height>91</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="text_nic_info">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>261</width>
+      <height>111</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="push_nic_reset">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>191</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="push_public">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>0</y>
+      <width>81</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>
+Check
+Public IP
+</string>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

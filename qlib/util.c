@@ -6,8 +6,7 @@
 #include <linux/rtnetlink.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
-//#include <curl/curl.h>
+#include <netinet/in.h>
 
 #define NETLINK_BUFSIZE 4096
 
@@ -59,6 +58,11 @@ unsigned char * ether_ntoa_e(unsigned char * mac, int len)
 			mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
 	return hf_mac;
+}
+
+unsigned char * inet_ntoa_e(unsigned int ip)
+{
+	return inet_ntoa(*(struct in_addr *)&ip);
 }
 
 int send_req(int nl_sock, int type, int * nlseq)
@@ -117,6 +121,12 @@ int parse_route(struct nlmsghdr * nlmsg, void * gw)
 
 	static int cnt = 1;
 	
+	if (!gw)
+	{
+		cnt = 1;
+		return -1;
+	}
+
 	index = *((int *)ref[0]);
 	rtmsg = (struct rtmsg *)(NLMSG_DATA(nlmsg));
 	if (rtmsg->rtm_family != PF_INET || rtmsg->rtm_table != RT_TABLE_MAIN)
@@ -144,7 +154,7 @@ int parse_route(struct nlmsghdr * nlmsg, void * gw)
 			break;
 		}
 
-		printf("%d, %s\n", cnt++, inet_ntoa(*(struct in_addr *)&ip));
+		//printf("%d, %s\n", cnt++, inet_ntoa(*(struct in_addr *)&ip));
 	}
 
 	return cnt;
@@ -158,6 +168,9 @@ int parse_neigh(struct nlmsghdr * nlmsg, void * gw)
 	unsigned int ip;
 	unsigned char mac[6];
 	char ** ref = (char **)gw;
+
+	if (!gw)
+		return -1;
 
 	ndmsg = (struct ndmsg *)(NLMSG_DATA(nlmsg));
 	if (ndmsg->ndm_family != PF_INET)
@@ -202,6 +215,8 @@ void parse_rep(unsigned char * buf, int tot_len, void * arg,
 		if (!parse(nlmsg, arg))
 			break;
 	}
+
+	parse(nlmsg, NULL);
 }
 
 int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
@@ -225,8 +240,6 @@ int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
 	if ((msg_len = recv_rep(nl_sock, buf, nlseq)) < 0)
 		goto err;
 	parse_rep(buf, msg_len, ref, parse_route);
-
-	//puts("");
 	
 	//Lookup Neighbour table
 	if (send_req(nl_sock, RTM_GETNEIGH, &nlseq) < 0)
@@ -245,7 +258,7 @@ err:
 
 char * get_public_ip(void)
 {
-	int sock, len;
+	int sock, off;
 	struct sockaddr_in serv;
 	const char * query = "GET /ip HTTP/1.1\r\n"
 			"Host: ifconfig.me\r\n"
@@ -266,7 +279,8 @@ char * get_public_ip(void)
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
 		return NULL;
-	
+
+	memset(ans, 0, sizeof(ans));	
 	memset(&serv, 0, sizeof(serv));
 	serv.sin_family = PF_INET;
 	serv.sin_addr.s_addr = ip[0];
@@ -276,15 +290,17 @@ char * get_public_ip(void)
 		goto err;
 	if (send(sock, query, strlen(query), 0) < 0)
 		goto err;
-	if ((len = recv(sock, ans, BUFSZ - 1, 0)) < 0)
+	if (recv(sock, ans, BUFSZ - 1, 0) < 0)
 		goto err;
-
-	ans[len] = 0;
 
 	cur = strtok(ans, "\r\n");
 	prev = cur;
-	//check HTTP code
 
+	//check HTTP code
+	for (off = 0; cur[off] != 0 && cur[off++] != ' ';);
+	if (cur[off] != '2')
+		goto err;
+	
 	while ((cur = strtok(NULL, "\r\n")))
 		prev = cur;
 
@@ -295,13 +311,14 @@ err:
 	close(sock);
 	return NULL;
 }
+
 /*size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
 {
 	strncpy(userdata, ptr, 63);
 	return size * nmemb;
-}
+}*/
 
-char * get_vendor(unsigned char * mac)
+/*char * get_vendor(unsigned char * mac)
 {
 	static char vendor[64];
 	char url[128] = "https://api.macvendors.com/";

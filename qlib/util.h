@@ -16,6 +16,9 @@
 	//return readable mac address
 	unsigned char * ether_ntoa_e(unsigned char * mac, int len);
 
+	//return readable ip address
+	unsigned char * inet_ntoa_e(unsigned int ip);
+
 	//fail -> return -1
 	//success -> return 0
 	int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac);

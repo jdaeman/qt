@@ -15,6 +15,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_list_nic_clicked(const QModelIndex &index);
+
+    void on_push_nic_reset_clicked();
+
+    void on_push_public_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
