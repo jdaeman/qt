@@ -118,7 +118,6 @@ int parse_route(struct nlmsghdr * nlmsg, void * gw)
 	static int cnt = 1;
 	
 	index = *((int *)ref[0]);
-
 	rtmsg = (struct rtmsg *)(NLMSG_DATA(nlmsg));
 	if (rtmsg->rtm_family != PF_INET || rtmsg->rtm_table != RT_TABLE_MAIN)
 		return -1;
@@ -189,7 +188,7 @@ int parse_neigh(struct nlmsghdr * nlmsg, void * gw)
 		return 0;
 	}
 	
-	return 1;
+	return 1; //cont
 }
 
 void parse_rep(unsigned char * buf, int tot_len, void * arg,
@@ -227,7 +226,7 @@ int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac)
 		goto err;
 	parse_rep(buf, msg_len, ref, parse_route);
 
-	puts("");
+	//puts("");
 	
 	//Lookup Neighbour table
 	if (send_req(nl_sock, RTM_GETNEIGH, &nlseq) < 0)
@@ -244,7 +243,58 @@ err:
 	return -1;
 }
 
+char * get_public_ip(void)
+{
+	int sock, len;
+	struct sockaddr_in serv;
+	const char * query = "GET /ip HTTP/1.1\r\n"
+			"Host: ifconfig.me\r\n"
+			"Connection: keep-alive\r\n"
+			"\r\n";
+	char * cur, * prev = NULL;
+	//checkip.amazonaws.com//
 
+#ifndef BUFSZ
+#define BUFSZ 512
+#endif
+	static unsigned int ip[1];	
+	static char ans[BUFSZ];
+
+	if (!ip[0] && (get_domain_ip("ifconfig.me", ip, 1) < 0))
+		return NULL;
+
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+	if (sock < 0)
+		return NULL;
+	
+	memset(&serv, 0, sizeof(serv));
+	serv.sin_family = PF_INET;
+	serv.sin_addr.s_addr = ip[0];
+	serv.sin_port = htons(80); //HTTP
+	
+	if (connect(sock, (struct sockaddr *)&serv, sizeof(serv)) < 0)
+		goto err;
+	if (send(sock, query, strlen(query), 0) < 0)
+		goto err;
+	if ((len = recv(sock, ans, BUFSZ - 1, 0)) < 0)
+		goto err;
+
+	ans[len] = 0;
+
+	cur = strtok(ans, "\r\n");
+	prev = cur;
+	//check HTTP code
+
+	while ((cur = strtok(NULL, "\r\n")))
+		prev = cur;
+
+	close(sock);
+	return prev;
+
+err:
+	close(sock);
+	return NULL;
+}
 /*size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
 {
 	strncpy(userdata, ptr, 63);

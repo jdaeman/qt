@@ -20,6 +20,8 @@
 	//success -> return 0
 	int get_gw_info(int ifindex, unsigned int * ip, unsigned char * mac);
 
+	char * get_public_ip(void);
+
 	//return vendor name
 	//char * get_vendor(unsigned char * mac);
 
