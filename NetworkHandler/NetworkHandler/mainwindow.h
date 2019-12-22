@@ -23,10 +23,11 @@ private slots:
 
     void on_push_public_clicked();
 
-    void on_pushButton_clicked();
+    void on_push_sniff_clicked();
 
 private:
     Ui::MainWindow *ui;
+    SniffDialog sd;
     int which;
 };
 #endif // MAINWINDOW_H

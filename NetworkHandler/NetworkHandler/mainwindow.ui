@@ -63,7 +63,7 @@ Public IP
 </string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="push_sniff">
     <property name="geometry">
      <rect>
       <x>0</x>

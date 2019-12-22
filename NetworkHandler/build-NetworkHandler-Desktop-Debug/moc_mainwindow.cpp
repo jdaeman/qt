@@ -35,12 +35,12 @@ QT_MOC_LITERAL(2, 31, 0), // ""
 QT_MOC_LITERAL(3, 32, 5), // "index"
 QT_MOC_LITERAL(4, 38, 25), // "on_push_nic_reset_clicked"
 QT_MOC_LITERAL(5, 64, 22), // "on_push_public_clicked"
-QT_MOC_LITERAL(6, 87, 21) // "on_pushButton_clicked"
+QT_MOC_LITERAL(6, 87, 21) // "on_push_sniff_clicked"
 
     },
     "MainWindow\0on_list_nic_clicked\0\0index\0"
     "on_push_nic_reset_clicked\0"
-    "on_push_public_clicked\0on_pushButton_clicked"
+    "on_push_public_clicked\0on_push_sniff_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -81,7 +81,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->on_list_nic_clicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
         case 1: _t->on_push_nic_reset_clicked(); break;
         case 2: _t->on_push_public_clicked(); break;
-        case 3: _t->on_pushButton_clicked(); break;
+        case 3: _t->on_push_sniff_clicked(); break;
         default: ;
         }
     }

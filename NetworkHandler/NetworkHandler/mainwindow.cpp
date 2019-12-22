@@ -77,7 +77,7 @@ void MainWindow::on_push_public_clicked()
     mbox.exec();
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_push_sniff_clicked()
 {
     int ret;
     QMessageBox mbox;
@@ -91,18 +91,14 @@ void MainWindow::on_pushButton_clicked()
     }
 
     struct nic * nic = get_nic(which);
-    if ((ret = sniff_init(nic->index, 0)) < 0)
+    ret = sd.sniff_setup(nic);
+
+    if (ret < 0)
     {
         mbox.setText(strerror(-ret));
         mbox.exec();
         return;
     }
 
-    SniffDialog sd;
-
-    sd.set_which(which);
-    ret = sd.exec();
-    qDebug() << ret;
-
-    sniff_exit();
+    sd.show();
 }

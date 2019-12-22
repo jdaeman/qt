@@ -17,6 +17,8 @@ signals:
 
 private:
     void run(void);
+
+    void set_filter(int * filter, int len);
 };
 
 #endif // SNIFFER_H

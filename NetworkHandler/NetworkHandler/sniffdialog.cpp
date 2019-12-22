@@ -1,6 +1,7 @@
 #include "sniffdialog.h"
 #include "ui_sniffdialog.h"
 
+#include <QStringList>
 #include <QDebug>
 
 SniffDialog::SniffDialog(QWidget *parent) :
@@ -19,6 +20,18 @@ SniffDialog::SniffDialog(QWidget *parent) :
 SniffDialog::~SniffDialog()
 {
     delete ui;
+}
+
+int SniffDialog::sniff_setup(struct nic * nic)
+{
+    int err = sniff_init(nic->index, 0);
+    if (err < 0)
+        return err;
+
+    int ar[1] = {ALL};
+    sniff_set_filter(ar, 1);
+
+    return 0;
 }
 
 void SniffDialog::on_push_start_clicked()
@@ -47,6 +60,24 @@ void SniffDialog::capture(unsigned char *buf, int len, void *arg)
 
 void SniffDialog::on_edit_filter_editingFinished()
 {
+    /*
     //protocl filter
-    qDebug() << ui->edit_filter->text();
+    char msg[512];
+    char * ptr;
+    int list[64], cnt = 0;
+
+    QString filter = ui->edit_filter->text().toLower();
+    if (filter.length() > 512)
+        return;
+
+    strcpy(msg, filter.toLocal8Bit().data());
+
+    */
+
+}
+
+void SniffDialog::on_SniffDialog_finished(int result)
+{
+    sniff_exit();
+    qDebug() << result;
 }

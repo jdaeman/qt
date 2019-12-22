@@ -8,8 +8,13 @@
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
 #include <linux/if_ether.h>
+#include <linux/if_arp.h>
+#include <linux/ip.h>
 
-static int sniffer; //sniffer socket
+#include "sniff.h"
+
+static int sniffer = -1; //sniffer socket
+static long long protos = 1; //default is all
 
 int set_dev_bind(int sock, int ifindex)
 {
@@ -42,19 +47,54 @@ int set_dev_promisc(int sock, int ifindex)
 
 int sniff(unsigned char * buff, int buff_len)
 {
-	int len = recvfrom(sniffer, buff, buff_len - 1, 0, NULL, NULL);		
+	int len = recvfrom(sniffer, buff, buff_len - 1, 0, NULL, NULL);	
+	int off;
+	struct ethhdr * eth;
+	struct iphdr * ip;
 
 	if (len <= 0)
 		return -errno;
 
 	buff[len] = 0;
-	return len;
-}
 
+	if (protos & ALL) //ALL
+		return len;
+			
+	eth = (struct ethhdr *)buff;
+	if (ntohs(eth->h_proto) == ETH_P_ARP && protos & (1 << ARP))
+		return len;
+
+	ip = (struct iphdr *)(eth + 1);
+	switch(ip->protocol)
+	{
+	case IPPROTO_ICMP:
+		off = ICMP;
+		break;
+	case IPPROTO_IGMP:
+		off = IGMP;
+		break;
+	case IPPROTO_TCP:
+		off = TCP;
+		break;
+	case IPPROTO_UDP:
+		off = UDP;
+		break;
+	deafult:
+		return 0;	
+	}
+
+	if (protos & (1 << off))
+		return len;
+
+	return 0; 
+}
 
 int sniff_init(int ifindex, int promisc)
 {
 	int err;
+
+	if (sniffer != -1)
+		return -512;
 
 	sniffer = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if (sniffer < 0)
@@ -76,7 +116,24 @@ int sniff_exit(void)
 {
 	if (close(sniffer) < 0)
 		return -errno;
+
+	sniffer = -1;
 	return 0;
+}
+
+void sniff_set_filter(int * filter, int len)
+{
+	long long list = 0;
+	int s;
+
+	for (s = 0; s < len; s++)
+	{
+		int v = filter[s];
+
+		list |= (1 << v);
+	}
+	
+	protos = list;	
 }
 
 /*int main()

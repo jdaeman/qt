@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include "sniffer.h"
+#include "sniff.h"
+#include "nic.h"
 
 namespace Ui {
 class SniffDialog;
@@ -16,10 +18,7 @@ public:
     explicit SniffDialog(QWidget *parent = 0);
     ~SniffDialog();
 
-    void set_which(int value)
-    {
-        which = value;
-    }
+    int sniff_setup(struct nic * nic);
 
 private slots:
     void on_push_start_clicked();
@@ -30,7 +29,8 @@ private slots:
 
     void on_edit_filter_editingFinished();
 
-    void on_push_start_released();
+
+    void on_SniffDialog_finished(int result);
 
 private:
     Ui::SniffDialog *ui;
