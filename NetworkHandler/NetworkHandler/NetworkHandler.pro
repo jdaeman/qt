@@ -18,14 +18,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    nic.cpp
+    nic.cpp \
+    sniffdialog.cpp \
+    sniffer.cpp
 
 HEADERS += \
     mainwindow.h \
-    nic.h
+    nic.h \
+    sniffdialog.h \
+    sniffer.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    sniffdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -39,3 +44,10 @@ INCLUDEPATH += $$PWD/../../qlib
 DEPENDPATH += $$PWD/../../qlib
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libutil.a
+
+unix:!macx: LIBS += -L$$PWD/../../qlib/ -lsniff
+
+INCLUDEPATH += $$PWD/../../qlib
+DEPENDPATH += $$PWD/../../qlib
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libsniff.a

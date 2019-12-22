@@ -63,6 +63,19 @@ Public IP
 </string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>140</y>
+      <width>531</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Packet Capture</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

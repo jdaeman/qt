@@ -5,13 +5,16 @@
 
 #include "nic.h"
 #include <util.h>
+#include <sniff.h>
 #include <QMessageBox>
+#include <string.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    which = -1;
 }
 
 MainWindow::~MainWindow()
@@ -25,6 +28,7 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
     int idx = index.row();
 
     struct nic * nic = get_nic(idx);
+    which = idx;
 
     ui->text_nic_info->clear();
     qstr.sprintf("IP\t%s", inet_ntoa_e(nic->ip));
@@ -42,6 +46,7 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
 void MainWindow::on_push_nic_reset_clicked()
 {
     ui->list_nic->clear();
+    which = -1;
 
     int cnt = init_nic();
     if (cnt < 0)
@@ -70,4 +75,34 @@ void MainWindow::on_push_public_clicked()
         mbox.setText("OOPS, some error");
 
     mbox.exec();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    int ret;
+    QMessageBox mbox;
+
+    mbox.setWindowTitle("OOPS");
+    if (which < 0)
+    {
+        mbox.setText("Check interface");
+        mbox.exec();
+        return;
+    }
+
+    struct nic * nic = get_nic(which);
+    if ((ret = sniff_init(nic->index, 0)) < 0)
+    {
+        mbox.setText(strerror(-ret));
+        mbox.exec();
+        return;
+    }
+
+    SniffDialog sd;
+
+    sd.set_which(which);
+    ret = sd.exec();
+    qDebug() << ret;
+
+    sniff_exit();
 }

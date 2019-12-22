@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <linux/if_packet.h>
+#include <linux/if_ether.h>
+
+static int sniffer; //sniffer socket
+
+int set_dev_bind(int sock, int ifindex)
+{
+	struct sockaddr_ll sll;
+	
+	memset(&sll, 0, sizeof(sll));
+	sll.sll_family = PF_PACKET;
+	sll.sll_ifindex = ifindex;
+	sll.sll_protocol = htons(ETH_P_ALL);
+	
+	if (bind(sock, (struct sockaddr *)&sll, sizeof(sll)) < 0)
+		return -1;
+
+	return 0;
+}
+
+int set_dev_promisc(int sock, int ifindex)
+{
+	struct packet_mreq pm;
+	
+	memset(&pm, 0, sizeof(pm));
+	pm.mr_ifindex = ifindex;
+	pm.mr_type = PACKET_MR_PROMISC;
+
+	if (setsockopt(sock, SOL_PACKET, PACKET_ADD_MEMBERSHIP, &pm, sizeof(pm)) < 0)
+		return -1;
+
+	return 0;
+}
+
+int sniff(unsigned char * buff, int buff_len)
+{
+	int len = recvfrom(sniffer, buff, buff_len - 1, 0, NULL, NULL);		
+
+	if (len <= 0)
+		return -errno;
+
+	buff[len] = 0;
+	return len;
+}
+
+
+int sniff_init(int ifindex, int promisc)
+{
+	int err;
+
+	sniffer = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	if (sniffer < 0)
+		return -errno;
+	if (set_dev_bind(sniffer, ifindex) < 0)
+		goto err;
+	if (promisc != 0 && set_dev_promisc(sniffer, ifindex) < 0)
+		goto err;
+
+	return 0;
+
+err:
+	err = errno;
+	close(sniffer);
+	return -err;
+}
+
+int sniff_exit(void)
+{
+	if (close(sniffer) < 0)
+		return -errno;
+	return 0;
+}
+
+/*int main()
+{
+	if (sniff(2, 1, SIGINT, NULL, NULL) < 0)
+	{
+		
+	}
+	return 0;
+}*/
