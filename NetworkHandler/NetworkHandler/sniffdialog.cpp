@@ -4,6 +4,10 @@
 #include <QStringList>
 #include <QDebug>
 
+#include <linux/if_ether.h>
+#include <linux/ip.h>
+#include <arpa/inet.h>
+
 SniffDialog::SniffDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SniffDialog)
@@ -24,12 +28,12 @@ SniffDialog::~SniffDialog()
 
 int SniffDialog::sniff_setup(struct nic * nic)
 {
-    int err = sniff_init(nic->index, 0);
+    int err = sniff_init(nic->index, 1);
     if (err < 0)
         return err;
 
-    int ar[1] = {ALL};
-    sniff_set_filter(ar, 1);
+    //int ar[1] = {ALL};
+    //sniff_set_filter(ar, 1);
 
     return 0;
 }
@@ -54,8 +58,16 @@ void SniffDialog::on_push_stop_clicked()
 void SniffDialog::capture(unsigned char *buf, int len, void *arg)
 {
     QString tmp;
-    tmp.sprintf("%d", len);
+
+    if (len < 1500)
+        return;
+
+    struct ethhdr * eth = (struct ethhdr *)buf;
+    struct iphdr * ip = (struct iphdr *)(eth + 1);
+
+    tmp.sprintf("\t%d", ntohs(ip->tot_len));
     ui->listWidget->addItem(tmp);
+    ui->listWidget->scrollToBottom();
 }
 
 void SniffDialog::on_edit_filter_editingFinished()
@@ -81,3 +93,4 @@ void SniffDialog::on_SniffDialog_finished(int result)
     sniff_exit();
     qDebug() << result;
 }
+

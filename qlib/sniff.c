@@ -14,7 +14,6 @@
 #include "sniff.h"
 
 static int sniffer = -1; //sniffer socket
-static long long protos = 1; //default is all
 
 int set_dev_bind(int sock, int ifindex)
 {
@@ -55,38 +54,8 @@ int sniff(unsigned char * buff, int buff_len)
 	if (len <= 0)
 		return -errno;
 
-	buff[len] = 0;
-
-	if (protos & ALL) //ALL
-		return len;
-			
-	eth = (struct ethhdr *)buff;
-	if (ntohs(eth->h_proto) == ETH_P_ARP && protos & (1 << ARP))
-		return len;
-
-	ip = (struct iphdr *)(eth + 1);
-	switch(ip->protocol)
-	{
-	case IPPROTO_ICMP:
-		off = ICMP;
-		break;
-	case IPPROTO_IGMP:
-		off = IGMP;
-		break;
-	case IPPROTO_TCP:
-		off = TCP;
-		break;
-	case IPPROTO_UDP:
-		off = UDP;
-		break;
-	deafult:
-		return 0;	
-	}
-
-	if (protos & (1 << off))
-		return len;
-
-	return 0; 
+	buff[len] = 0;	
+	return len; 
 }
 
 int sniff_init(int ifindex, int promisc)
@@ -123,7 +92,7 @@ int sniff_exit(void)
 
 void sniff_set_filter(int * filter, int len)
 {
-	long long list = 0;
+	/*long long list = 0;
 	int s;
 
 	for (s = 0; s < len; s++)
@@ -133,7 +102,7 @@ void sniff_set_filter(int * filter, int len)
 		list |= (1 << v);
 	}
 	
-	protos = list;	
+	protos = list;*/
 }
 
 /*int main()

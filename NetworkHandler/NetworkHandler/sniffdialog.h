@@ -32,6 +32,8 @@ private slots:
 
     void on_SniffDialog_finished(int result);
 
+
+
 private:
     Ui::SniffDialog *ui;
     Sniffer sniffer;
