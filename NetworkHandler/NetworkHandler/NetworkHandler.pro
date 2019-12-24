@@ -20,7 +20,8 @@ SOURCES += \
     mainwindow.cpp \
     nic.cpp \
     sniffdialog.cpp \
-    sniffer.cpp
+    sniffer.cpp \
+    parse.cpp
 
 HEADERS += \
     mainwindow.h \

@@ -1,14 +1,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <net/if.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
+#include <net/if.h>
 
 #include "nic.h"
-#include <util.h>
+#include "util.h"
 
-struct nic nics[8];
+static struct nic nics[8];
 
 int init_nic(void)
 {
@@ -42,6 +42,9 @@ int init_nic(void)
 
         ioctl(sock, SIOCGIFHWADDR, &ifr); //get interface mac
         memcpy(nics[cnt].mac, ifr.ifr_hwaddr.sa_data, 6);
+
+        ioctl(sock, SIOCGIFMTU, &ifr);
+        nics[cnt].mtu = ifr.ifr_mtu;
 
         get_gw_info(itf->if_index, &nics[cnt].route, nics[cnt].neigh);
 

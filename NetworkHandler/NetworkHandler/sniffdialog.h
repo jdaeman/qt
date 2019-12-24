@@ -1,10 +1,10 @@
 #ifndef SNIFFDIALOG_H
 #define SNIFFDIALOG_H
 
-#include <QDialog>
 #include "sniffer.h"
-#include "sniff.h"
 #include "nic.h"
+
+#include <QDialog>
 
 namespace Ui {
 class SniffDialog;
@@ -29,10 +29,7 @@ private slots:
 
     void on_edit_filter_editingFinished();
 
-
     void on_SniffDialog_finished(int result);
-
-
 
 private:
     Ui::SniffDialog *ui;

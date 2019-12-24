@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
-
 #include "nic.h"
-#include <util.h>
-#include <sniff.h>
+#include "util.h"
+#include "sniff.h"
+
+#include <QDebug>
 #include <QMessageBox>
 #include <string.h>
 
@@ -36,6 +36,8 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
     qstr.sprintf("Subnet\t%s", inet_ntoa_e(nic->subnet));
     ui->text_nic_info->append(qstr);
     qstr.sprintf("MAC\t%s", ether_ntoa_e(nic->mac, 6));
+    ui->text_nic_info->append(qstr);
+    qstr.sprintf("MTU\t%d", nic->mtu);
     ui->text_nic_info->append(qstr);
     qstr.sprintf("Gateway\t%s", inet_ntoa_e(nic->route));
     ui->text_nic_info->append(qstr);

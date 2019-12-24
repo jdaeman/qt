@@ -1,12 +1,10 @@
 #include "sniffdialog.h"
 #include "ui_sniffdialog.h"
 
+#include "sniff.h"
+
 #include <QStringList>
 #include <QDebug>
-
-#include <linux/if_ether.h>
-#include <linux/ip.h>
-#include <arpa/inet.h>
 
 SniffDialog::SniffDialog(QWidget *parent) :
     QDialog(parent),
@@ -32,9 +30,6 @@ int SniffDialog::sniff_setup(struct nic * nic)
     if (err < 0)
         return err;
 
-    //int ar[1] = {ALL};
-    //sniff_set_filter(ar, 1);
-
     return 0;
 }
 
@@ -59,13 +54,7 @@ void SniffDialog::capture(unsigned char *buf, int len, void *arg)
 {
     QString tmp;
 
-    if (len < 1500)
-        return;
-
-    struct ethhdr * eth = (struct ethhdr *)buf;
-    struct iphdr * ip = (struct iphdr *)(eth + 1);
-
-    tmp.sprintf("\t%d", ntohs(ip->tot_len));
+    tmp.sprintf("\t%d", len);
     ui->listWidget->addItem(tmp);
     ui->listWidget->scrollToBottom();
 }

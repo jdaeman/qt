@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QObject>
-#include "nic.h"
 
 class Sniffer : public QThread
 {
@@ -16,6 +15,8 @@ signals:
     void capture(unsigned char * buf, int len, void * arg);
 
 private:
+    int mtu;
+
     void run(void);
 
     void set_filter(int * filter, int len);

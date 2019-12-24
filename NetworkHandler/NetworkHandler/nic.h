@@ -12,6 +12,8 @@ struct nic
 
     unsigned int route;
     unsigned char neigh[6];
+
+    int mtu;
 };
 
 int init_nic(void);
