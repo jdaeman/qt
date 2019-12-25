@@ -34,11 +34,16 @@ private slots:
 
     void on_list_packet_clicked(const QModelIndex &index);
 
+    void on_list_packet_currentRowChanged(int currentRow);
+
 private:
     Ui::SniffDialog *ui;
     Sniffer sniffer;
     int which;
     std::vector<unsigned char *> pkts;
+
+    unsigned char * pktss[1000000];
+    int last_pkt;
 
     void clear_pkts();
 };

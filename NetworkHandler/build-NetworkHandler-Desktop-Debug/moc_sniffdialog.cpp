@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_SniffDialog_t {
-    QByteArrayData data[14];
-    char stringdata0[182];
+    QByteArrayData data[16];
+    char stringdata0[226];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -42,7 +42,9 @@ QT_MOC_LITERAL(9, 91, 30), // "on_edit_filter_editingFinished"
 QT_MOC_LITERAL(10, 122, 23), // "on_SniffDialog_finished"
 QT_MOC_LITERAL(11, 146, 6), // "result"
 QT_MOC_LITERAL(12, 153, 22), // "on_list_packet_clicked"
-QT_MOC_LITERAL(13, 176, 5) // "index"
+QT_MOC_LITERAL(13, 176, 5), // "index"
+QT_MOC_LITERAL(14, 182, 32), // "on_list_packet_currentRowChanged"
+QT_MOC_LITERAL(15, 215, 10) // "currentRow"
 
     },
     "SniffDialog\0on_push_start_clicked\0\0"
@@ -50,7 +52,9 @@ QT_MOC_LITERAL(13, 176, 5) // "index"
     "unsigned char*\0buf\0len\0arg\0"
     "on_edit_filter_editingFinished\0"
     "on_SniffDialog_finished\0result\0"
-    "on_list_packet_clicked\0index"
+    "on_list_packet_clicked\0index\0"
+    "on_list_packet_currentRowChanged\0"
+    "currentRow"
 };
 #undef QT_MOC_LITERAL
 
@@ -60,7 +64,7 @@ static const uint qt_meta_data_SniffDialog[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -68,12 +72,13 @@ static const uint qt_meta_data_SniffDialog[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   44,    2, 0x08 /* Private */,
-       3,    0,   45,    2, 0x08 /* Private */,
-       4,    3,   46,    2, 0x08 /* Private */,
-       9,    0,   53,    2, 0x08 /* Private */,
-      10,    1,   54,    2, 0x08 /* Private */,
-      12,    1,   57,    2, 0x08 /* Private */,
+       1,    0,   49,    2, 0x08 /* Private */,
+       3,    0,   50,    2, 0x08 /* Private */,
+       4,    3,   51,    2, 0x08 /* Private */,
+       9,    0,   58,    2, 0x08 /* Private */,
+      10,    1,   59,    2, 0x08 /* Private */,
+      12,    1,   62,    2, 0x08 /* Private */,
+      14,    1,   65,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -82,6 +87,7 @@ static const uint qt_meta_data_SniffDialog[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   11,
     QMetaType::Void, QMetaType::QModelIndex,   13,
+    QMetaType::Void, QMetaType::Int,   15,
 
        0        // eod
 };
@@ -98,6 +104,7 @@ void SniffDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 3: _t->on_edit_filter_editingFinished(); break;
         case 4: _t->on_SniffDialog_finished((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->on_list_packet_clicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 6: _t->on_list_packet_currentRowChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -128,13 +135,13 @@ int SniffDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 7;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
+        if (_id < 7)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 6;
+        _id -= 7;
     }
     return _id;
 }

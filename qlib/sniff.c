@@ -123,7 +123,7 @@ unsigned char * udp_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 	next = NULL;
 	if (summ)
 	{
-		sprintf(summ, "UDP port %d -> %d", ntohs(udp->source), ntohs(udp->dest));
+		sprintf(summ, "UDP %d -> %d", ntohs(udp->source), ntohs(udp->dest));
 		return NULL;
 	}
 
@@ -152,12 +152,16 @@ unsigned char * tcp_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 	next = NULL;
 	if (summ)
 	{
-		sprintf(summ, "TCP port %d -> %d ", ntohs(tcp->source), ntohs(tcp->dest));
+		unsigned char flags[64];
+
+		memset(flags, 0, sizeof(flags));
 		for (; off < 8; off++)
 		{
 			if (flag & (1 << off))
-				strcat(summ, op[off]);
+				strcat(flags, op[off]);
 		}
+	
+		sprintf(summ, "TCP %s %u -> %u", flags, ntohs(tcp->source), ntohs(tcp->dest));
 		return NULL;
 	}
 
@@ -195,7 +199,7 @@ unsigned char * icmp_handle(unsigned char * pkt, unsigned char * buf, unsigned c
 		return NULL;
 	}
 
-	sprintf(buf, "Internet Control Management Protocol\n"
+	sprintf(buf, "Internet Control Message Protocol\n"
 		"\tType: %d\n"
 		"\tcode: %d\n"
 		"\tCheck sum: %#04x\n",
@@ -349,7 +353,7 @@ unsigned char * eth_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 		next = NULL;
 
 	if (!next && summ)
-		sprintf(summ, "ETH: Not-registered: %#04x\n", proto);
+		sprintf(summ, "ETH: Not-registered: %#04x", proto);
 
 	return (unsigned char *)(eth + 1);
 }
