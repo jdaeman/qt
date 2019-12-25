@@ -18,6 +18,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTextBrowser>
 
 QT_BEGIN_NAMESPACE
 
@@ -25,9 +26,10 @@ class Ui_SniffDialog
 {
 public:
     QLineEdit *edit_filter;
-    QListWidget *listWidget;
+    QListWidget *list_packet;
     QPushButton *push_start;
     QPushButton *push_stop;
+    QTextBrowser *text_detail;
 
     void setupUi(QDialog *SniffDialog)
     {
@@ -36,18 +38,21 @@ public:
         SniffDialog->resize(630, 520);
         edit_filter = new QLineEdit(SniffDialog);
         edit_filter->setObjectName(QStringLiteral("edit_filter"));
-        edit_filter->setGeometry(QRect(0, 40, 621, 27));
-        listWidget = new QListWidget(SniffDialog);
-        listWidget->setObjectName(QStringLiteral("listWidget"));
-        listWidget->setGeometry(QRect(0, 70, 621, 192));
+        edit_filter->setGeometry(QRect(10, 40, 610, 27));
+        list_packet = new QListWidget(SniffDialog);
+        list_packet->setObjectName(QStringLiteral("list_packet"));
+        list_packet->setGeometry(QRect(10, 70, 610, 201));
         push_start = new QPushButton(SniffDialog);
         push_start->setObjectName(QStringLiteral("push_start"));
-        push_start->setGeometry(QRect(0, 10, 99, 27));
+        push_start->setGeometry(QRect(10, 10, 99, 27));
         push_start->setAutoDefault(false);
         push_stop = new QPushButton(SniffDialog);
         push_stop->setObjectName(QStringLiteral("push_stop"));
-        push_stop->setGeometry(QRect(120, 10, 99, 27));
+        push_stop->setGeometry(QRect(140, 10, 99, 27));
         push_stop->setAutoDefault(false);
+        text_detail = new QTextBrowser(SniffDialog);
+        text_detail->setObjectName(QStringLiteral("text_detail"));
+        text_detail->setGeometry(QRect(10, 280, 610, 230));
 
         retranslateUi(SniffDialog);
 

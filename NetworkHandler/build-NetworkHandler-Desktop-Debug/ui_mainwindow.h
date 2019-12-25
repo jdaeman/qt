@@ -40,7 +40,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(800, 600);
+        MainWindow->resize(659, 600);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         list_nic = new QListWidget(centralwidget);
@@ -51,7 +51,7 @@ public:
         text_nic_info->setGeometry(QRect(190, 0, 261, 111));
         push_nic_reset = new QPushButton(centralwidget);
         push_nic_reset->setObjectName(QStringLiteral("push_nic_reset"));
-        push_nic_reset->setGeometry(QRect(0, 90, 191, 27));
+        push_nic_reset->setGeometry(QRect(0, 90, 191, 20));
         push_public = new QPushButton(centralwidget);
         push_public->setObjectName(QStringLiteral("push_public"));
         push_public->setGeometry(QRect(450, 0, 81, 111));
@@ -61,7 +61,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QStringLiteral("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 25));
+        menubar->setGeometry(QRect(0, 0, 659, 25));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QStringLiteral("statusbar"));

@@ -3,6 +3,7 @@
 
 #include "sniffer.h"
 #include "nic.h"
+#include <vector>
 
 #include <QDialog>
 
@@ -31,10 +32,15 @@ private slots:
 
     void on_SniffDialog_finished(int result);
 
+    void on_list_packet_clicked(const QModelIndex &index);
+
 private:
     Ui::SniffDialog *ui;
     Sniffer sniffer;
     int which;
+    std::vector<unsigned char *> pkts;
+
+    void clear_pkts();
 };
 
 #endif // SNIFFDIALOG_H

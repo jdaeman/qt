@@ -52,8 +52,7 @@ SOURCES       = ../NetworkHandler/main.cpp \
 		../NetworkHandler/mainwindow.cpp \
 		../NetworkHandler/nic.cpp \
 		../NetworkHandler/sniffdialog.cpp \
-		../NetworkHandler/sniffer.cpp \
-		../NetworkHandler/parse.cpp moc_mainwindow.cpp \
+		../NetworkHandler/sniffer.cpp moc_mainwindow.cpp \
 		moc_sniffdialog.cpp \
 		moc_sniffer.cpp
 OBJECTS       = main.o \
@@ -61,7 +60,6 @@ OBJECTS       = main.o \
 		nic.o \
 		sniffdialog.o \
 		sniffer.o \
-		parse.o \
 		moc_mainwindow.o \
 		moc_sniffdialog.o \
 		moc_sniffer.o
@@ -130,8 +128,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../NetworkHandler/mainwindow.cpp \
 		../NetworkHandler/nic.cpp \
 		../NetworkHandler/sniffdialog.cpp \
-		../NetworkHandler/sniffer.cpp \
-		../NetworkHandler/parse.cpp
+		../NetworkHandler/sniffer.cpp
 QMAKE_TARGET  = NetworkHandler
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = NetworkHandler
@@ -302,7 +299,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../NetworkHandler/mainwindow.h ../NetworkHandler/nic.h ../NetworkHandler/sniffdialog.h ../NetworkHandler/sniffer.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../NetworkHandler/main.cpp ../NetworkHandler/mainwindow.cpp ../NetworkHandler/nic.cpp ../NetworkHandler/sniffdialog.cpp ../NetworkHandler/sniffer.cpp ../NetworkHandler/parse.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../NetworkHandler/main.cpp ../NetworkHandler/mainwindow.cpp ../NetworkHandler/nic.cpp ../NetworkHandler/sniffdialog.cpp ../NetworkHandler/sniffer.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../NetworkHandler/mainwindow.ui ../NetworkHandler/sniffdialog.ui $(DISTDIR)/
 
 
@@ -394,9 +391,6 @@ sniffdialog.o: ../NetworkHandler/sniffdialog.cpp ../NetworkHandler/sniffdialog.h
 sniffer.o: ../NetworkHandler/sniffer.cpp ../NetworkHandler/sniffer.h \
 		../../qlib/sniff.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sniffer.o ../NetworkHandler/sniffer.cpp
-
-parse.o: ../NetworkHandler/parse.cpp ../../qlib/util.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o parse.o ../NetworkHandler/parse.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

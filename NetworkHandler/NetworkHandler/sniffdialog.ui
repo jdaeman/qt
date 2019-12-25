@@ -16,27 +16,27 @@
   <widget class="QLineEdit" name="edit_filter">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>40</y>
-     <width>621</width>
+     <width>610</width>
      <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QListWidget" name="list_packet">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>70</y>
-     <width>621</width>
-     <height>192</height>
+     <width>610</width>
+     <height>201</height>
     </rect>
    </property>
   </widget>
   <widget class="QPushButton" name="push_start">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>10</y>
      <width>99</width>
      <height>27</height>
@@ -52,7 +52,7 @@
   <widget class="QPushButton" name="push_stop">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>140</x>
      <y>10</y>
      <width>99</width>
      <height>27</height>
@@ -63,6 +63,16 @@
    </property>
    <property name="autoDefault">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="text_detail">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>610</width>
+     <height>230</height>
+    </rect>
    </property>
   </widget>
  </widget>

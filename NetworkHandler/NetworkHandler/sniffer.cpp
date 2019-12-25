@@ -13,7 +13,7 @@ void Sniffer::run()
 
     while (true)
     {
-        int len = sniff(buf, mtu);
+        int len = sniff(buf, 65536);
 
         if (len <= 0)
             continue;

@@ -48,15 +48,26 @@ void SniffDialog::on_push_stop_clicked()
 
     sniffer.terminate();
     sniffer.wait();
+
+    clear_pkts();
 }
 
 void SniffDialog::capture(unsigned char *buf, int len, void *arg)
 {
     QString tmp;
+    char summ[1024];
 
-    tmp.sprintf("\t%d", len);
-    ui->listWidget->addItem(tmp);
-    ui->listWidget->scrollToBottom();
+    if (packet_parse(buf, (unsigned char *)summ) < 0)
+        return;
+
+    unsigned char * pkt = new unsigned char [len];
+    memcpy(pkt, buf, len);
+    pkts.push_back(pkt);
+
+    tmp.sprintf("Length: %5d\t%s", len, summ);
+
+    ui->list_packet->addItem(tmp);
+    ui->list_packet->scrollToBottom();
 }
 
 void SniffDialog::on_edit_filter_editingFinished()
@@ -80,6 +91,31 @@ void SniffDialog::on_edit_filter_editingFinished()
 void SniffDialog::on_SniffDialog_finished(int result)
 {
     sniff_exit();
-    qDebug() << result;
+    clear_pkts();
 }
 
+void SniffDialog::on_list_packet_clicked(const QModelIndex &index)
+{
+    int idx = index.row();
+    int last = packet_parse(pkts[idx], NULL);
+    if (last < 0)
+        return;
+
+    ui->text_detail->clear();
+    for (int l = 2; l <= last; l++)
+    {
+        QString detail;
+        if (get_parsed(l) == NULL)
+            break;
+
+        detail.sprintf("%s\n", (const char *)get_parsed(l));
+        ui->text_detail->append(detail);
+    }
+}
+
+void SniffDialog::clear_pkts()
+{
+    for (unsigned int i = 0; i < pkts.size(); i++)
+        delete[]pkts[i];
+    pkts.clear();
+}

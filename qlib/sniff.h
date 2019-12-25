@@ -14,14 +14,9 @@
 
 	void sniff_set_filter(int * filter, int len);
 
-	enum {
-		ALL = 0,
-		ARP,
-		ICMP,
-		IGMP,
-		UDP,
-		TCP
-	};
+	int packet_parse(unsigned char * pkt, unsigned char * summ);
+
+	const unsigned char * get_parsed(int layer);
 
 #ifdef __cplusplus
 	}
