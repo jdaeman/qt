@@ -116,22 +116,148 @@ void sniff_set_filter(int * filter, int len)
 	protos = list;*/
 }
 
+unsigned char * udp_handle(unsigned char * pkt, unsigned char * buf, unsigned char * summ)
+{
+	struct udphdr * udp = (struct udphdr *)pkt;
+
+	next = NULL;
+	if (summ)
+	{
+		sprintf(summ, "UDP port %d -> %d", ntohs(udp->source), ntohs(udp->dest));
+		return NULL;
+	}
+
+	sprintf(buf, "UDP Segment\n"
+		"\tSource: %d\n"
+		"\tDestination: %d\n"
+		"\tLength: %d\n"
+		"\tCheck sum: %#04x",
+		ntohs(udp->source), ntohs(udp->dest),
+		ntohs(udp->len), udp->check);
+
+	return NULL;
+}
+
+unsigned char * tcp_handle(unsigned char * pkt, unsigned char * buf, unsigned char * summ)
+{
+	struct tcphdr * tcp = (struct tcphdr *)pkt;
+	unsigned short flag;
+	int off = 0;
+
+	static const char * op[] = {"Fin ", "Syn ", "Rst ", "Psh ", "Ack ", "Urg ", "Ece ", "Cwr"};
+	
+	memcpy(&flag, pkt + 12, 2);
+	flag = ntohs(flag);
+
+	next = NULL;
+	if (summ)
+	{
+		sprintf(summ, "TCP port %d -> %d ", ntohs(tcp->source), ntohs(tcp->dest));
+		for (; off < 8; off++)
+		{
+			if (flag & (1 << off))
+				strcat(summ, op[off]);
+		}
+		return NULL;
+	}
+
+	sprintf(buf, "TCP Segment\n"
+		"\tSource: %d\n"
+		"\tDestination: %d\n"
+		"\tSequence: %d\n"
+		"\tAcknowledgement: %d\n"
+		"\tHeader Length: %d\n"
+		"\tCwr: %d\tEce: %d\n"
+		"\tUrg: %d\tAck: %d\n"
+		"\tPsh: %d\tRst: %d\n"
+		"\tSyn: %d\tFin: %d\n"
+		"\tWindow Size: %d\n"
+		"\tCheck Sum: %#04x\n"
+		"\tUrgent Offset: %d",
+		ntohs(tcp->source), ntohs(tcp->dest),
+		ntohs(tcp->seq), ntohs(tcp->ack_seq),
+		tcp->doff * 4,
+		tcp->cwr, tcp->ece, tcp->urg, tcp->ack,
+		tcp->psh, tcp->rst, tcp->syn, tcp->fin,
+		ntohs(tcp->window), tcp->check,
+		ntohs(tcp->urg_ptr)); 
+
+	return NULL;
+}
+
+unsigned char * icmp_handle(unsigned char * pkt, unsigned char * buf, unsigned char * summ)
+{
+	struct icmphdr * icmp = (struct icmphdr *)pkt;
+	
+	if (summ)
+	{
+		sprintf(summ, "ICMP type: %d, code: %d", icmp->type, icmp->code);
+		return NULL;
+	}
+
+	sprintf(buf, "Internet Control Management Protocol\n"
+		"\tType: %d\n"
+		"\tcode: %d\n"
+		"\tCheck sum: %#04x\n",
+		icmp->type, icmp->code, icmp->checksum);
+
+	next = NULL;
+	return NULL;
+}
+
+unsigned char * igmp_handle(unsigned char * pkt, unsigned char * buf, unsigned char * summ)
+{
+	struct igmphdr * igmp = (struct igmphdr *)pkt;
+	unsigned char grp[32];
+
+	next = NULL;
+	if (summ)
+	{
+		sprintf(summ, "IGMP type: %d, code: %d", igmp->type, igmp->code);
+		return NULL;
+	}
+
+	strcpy(grp, inet_ntoa_e(igmp->group));
+	sprintf(buf, "Internet Group Management Protocol\n"
+		"\tType: %d\n"
+		"\tCode: %d\n"
+		"\tCheck Sum: %#04x\n"
+		"\tGroup IP: %s", 
+		igmp->type, igmp->code,
+		igmp->csum, grp);	
+
+	return NULL;
+}
+
 unsigned char * ip_handle(unsigned char * pkt, unsigned char * buf, unsigned char * summ)
 {
 	struct iphdr * ip = (struct iphdr *)pkt;
 	unsigned char src[32], dst[32];
 	unsigned short frag = ntohs(ip->frag_off);
 
-	strcpy(src, inet_ntoa_e(ip->saddr));
-	strcpy(dst, inet_ntoa_e(ip->daddr));
+	if (ip->protocol == IPPROTO_ICMP)
+		next = icmp_handle;
+	else if (ip->protocol == IPPROTO_UDP)
+		next = udp_handle;
+	else if (ip->protocol == IPPROTO_TCP)
+		next = tcp_handle;
+	else if (ip->protocol == IPPROTO_IGMP)
+		next = igmp_handle;
+	else
+		next = NULL;
 
 	if (summ)
 	{
-		strcpy((char *)summ, "More headers...");
-		return NULL;
+		if (!next)
+			sprintf(summ, "IP: Not-registered: %d", ip->protocol);
+
+		return (unsigned char *)(ip + 1);
 	}
 
-	sprintf(buf, "IP Datagram\n"
+	strcpy(src, inet_ntoa_e(ip->saddr));
+	strcpy(dst, inet_ntoa_e(ip->daddr));
+
+	sprintf(buf, "Internet Protocol Datagram\n"
 		"\tVersion: %d\tHeader Length: %d\n"
 		"\tToS: %d\n"
 		"\tTotal Length: %d\n"
@@ -143,7 +269,7 @@ unsigned char * ip_handle(unsigned char * pkt, unsigned char * buf, unsigned cha
 		"\tTTL: %d\tProtocol: %d\n"
 		"\tCheck Sum: %#04x\n"
 		"\tSource: %s\n"
-		"\tDestination: %s\n",
+		"\tDestination: %s",
 		ip->version, ip->ihl * 4, ip->tos,
 		ntohs(ip->tot_len),
 		ntohs(ip->id),
@@ -152,8 +278,7 @@ unsigned char * ip_handle(unsigned char * pkt, unsigned char * buf, unsigned cha
 		ip->check,
 		src, dst);
 
-	next = NULL;
-
+	
 	return (unsigned char *)(ip + 1);
 }
 
@@ -191,7 +316,7 @@ unsigned char * arp_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 		"\tSource Hardware: %s\n"
 		"\tSource IP: %s\n"
 		"\tDestination Hareware: %s\n"
-		"\tDestination IP: %s\n",
+		"\tDestination IP: %s",
 		ntohs(arp->ar_hrd), ntohs(arp->ar_pro),
 		arp->ar_hln, arp->ar_pln,
 		op, operations[op],
@@ -213,7 +338,7 @@ unsigned char * eth_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 	sprintf(buf, "Ethernet Frame\n"
 		"\tSource: %s\n"
 		"\tDestination: %s\n"
-		"\tProtocol: %#04x\n",
+		"\tProtocol: %#04x",
 		src, dst, proto);
 
 	if (proto == ETH_P_IP)
@@ -222,6 +347,9 @@ unsigned char * eth_handle(unsigned char * pkt, unsigned char * buf, unsigned ch
 		next = arp_handle;
 	else
 		next = NULL;
+
+	if (!next && summ)
+		sprintf(summ, "ETH: Not-registered: %#04x\n", proto);
 
 	return (unsigned char *)(eth + 1);
 }

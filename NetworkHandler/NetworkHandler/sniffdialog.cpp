@@ -38,6 +38,8 @@ void SniffDialog::on_push_start_clicked()
     ui->push_start->setEnabled(false);
     ui->push_stop->setEnabled(true);
 
+    clear_pkts();
+
     sniffer.start();
 }
 
@@ -48,8 +50,6 @@ void SniffDialog::on_push_stop_clicked()
 
     sniffer.terminate();
     sniffer.wait();
-
-    clear_pkts();
 }
 
 void SniffDialog::capture(unsigned char *buf, int len, void *arg)
@@ -64,7 +64,7 @@ void SniffDialog::capture(unsigned char *buf, int len, void *arg)
     memcpy(pkt, buf, len);
     pkts.push_back(pkt);
 
-    tmp.sprintf("Length: %5d\t%s", len, summ);
+    tmp.sprintf("%5d Bytes\t%s", len, summ);
 
     ui->list_packet->addItem(tmp);
     ui->list_packet->scrollToBottom();
