@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <string.h>
+#include <curl/curl.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -37,8 +38,8 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
     ui->text_nic_info->append(qstr);
     qstr.sprintf("MAC\t%s", ether_ntoa_e(nic->mac, 6));
     ui->text_nic_info->append(qstr);
-    qstr.sprintf("MTU\t%d", nic->mtu);
-    ui->text_nic_info->append(qstr);
+    //qstr.sprintf("MTU\t%d", nic->mtu);
+    //ui->text_nic_info->append(qstr);
     qstr.sprintf("Gateway\t%s", inet_ntoa_e(nic->route));
     ui->text_nic_info->append(qstr);
     qstr.sprintf("Neigh\t%s", ether_ntoa_e(nic->neigh, 6));
@@ -103,4 +104,17 @@ void MainWindow::on_push_sniff_clicked()
     }
 
     sd.show();
+}
+
+size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
+{
+    //printf("%s\n", ptr);
+    qDebug() << size * nmemb << endl << endl;
+
+    return size * nmemb;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+   testtest();
 }

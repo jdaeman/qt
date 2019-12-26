@@ -62,7 +62,6 @@ int sniff(unsigned char * buff, int buff_len)
 	struct ethhdr * eth;
 	struct iphdr * ip;
 
-	//memset(buff, 0, buff_len);
 	len = recvfrom(sniffer, buff, buff_len, 0, NULL, NULL);
 
 	if (len <= 0)

@@ -25,6 +25,8 @@ private slots:
 
     void on_push_sniff_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     SniffDialog sd;

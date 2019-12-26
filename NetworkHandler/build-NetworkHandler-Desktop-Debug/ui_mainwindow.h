@@ -33,6 +33,7 @@ public:
     QPushButton *push_nic_reset;
     QPushButton *push_public;
     QPushButton *push_sniff;
+    QPushButton *pushButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -58,6 +59,9 @@ public:
         push_sniff = new QPushButton(centralwidget);
         push_sniff->setObjectName(QStringLiteral("push_sniff"));
         push_sniff->setGeometry(QRect(0, 140, 531, 27));
+        pushButton = new QPushButton(centralwidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setGeometry(QRect(170, 300, 99, 27));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QStringLiteral("menubar"));
@@ -81,6 +85,7 @@ public:
 "Public IP\n"
 "", 0));
         push_sniff->setText(QApplication::translate("MainWindow", "Packet Capture", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
     } // retranslateUi
 
 };

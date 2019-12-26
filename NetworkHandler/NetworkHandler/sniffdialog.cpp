@@ -17,8 +17,6 @@ SniffDialog::SniffDialog(QWidget *parent) :
 
     connect(&sniffer, SIGNAL(capture(unsigned char *, int, void *)),
             this, SLOT(capture(unsigned char *, int, void *)));
-
-    last_pkt = 0;
 }
 
 SniffDialog::~SniffDialog()
@@ -40,6 +38,8 @@ void SniffDialog::on_push_start_clicked()
     ui->push_start->setEnabled(false);
     ui->push_stop->setEnabled(true);
 
+    ui->list_packet->clear();
+    ui->text_detail->clear();
     clear_pkts();
 
     sniffer.start();
@@ -60,18 +60,14 @@ void SniffDialog::capture(unsigned char *buf, int len, void *arg)
     char summ[1024];
 
     if (packet_parse(buf, (unsigned char *)summ) < 0)
+    {
+        delete[]buf;
         return;
-
-    unsigned char * pkt = new unsigned char [len];
-    memcpy(pkt, buf, len);
-    //pkts.push_back(pkt);
-
-    if (last_pkt > 1000000)
-        last_pkt = 0;
-
-    pktss[last_pkt++] = pkt;
+    }
 
     tmp.sprintf("%5d Bytes\t%s", len, summ);
+
+    pkts.push_back(buf);
 
     ui->list_packet->addItem(tmp);
     ui->list_packet->scrollToBottom();
@@ -92,37 +88,20 @@ void SniffDialog::on_edit_filter_editingFinished()
     strcpy(msg, filter.toLocal8Bit().data());
 
     */
-
 }
 
 void SniffDialog::on_SniffDialog_finished(int result)
 {
     sniff_exit();
     clear_pkts();
+    ui->list_packet->clear();
+    ui->text_detail->clear();
 }
 
 void SniffDialog::on_list_packet_clicked(const QModelIndex &index)
 {
     int idx = index.row();
-    if (idx >= 1000000)
-        return;
-    /*if (idx >= pkts.size())
-        return;*/
-
-    int last = packet_parse(pktss[idx], NULL);
-    if (last < 0)
-        return;
-
-    ui->text_detail->clear();
-    for (int l = 2; l <= last; l++)
-    {
-        QString detail;
-        if (get_parsed(l) == NULL)
-            break;
-
-        detail.sprintf("%s\n", (const char *)get_parsed(l));
-        ui->text_detail->append(detail);
-    }
+    show_detail(idx);
 }
 
 void SniffDialog::clear_pkts()
@@ -132,15 +111,13 @@ void SniffDialog::clear_pkts()
     pkts.clear();
 }
 
-void SniffDialog::on_list_packet_currentRowChanged(int currentRow)
+void SniffDialog::show_detail(int row)
 {
-    int idx = currentRow;
-    if (idx >= 1000000)
+    unsigned int idx = row;
+    if (idx >= pkts.size())
         return;
-    /*if (idx >= pkts.size())
-        return;*/
 
-    int last = packet_parse(pktss[idx], NULL);
+    int last = packet_parse(pkts[idx], NULL);
     if (last < 0)
         return;
 
@@ -154,4 +131,9 @@ void SniffDialog::on_list_packet_currentRowChanged(int currentRow)
         detail.sprintf("%s\n", (const char *)get_parsed(l));
         ui->text_detail->append(detail);
     }
+}
+
+void SniffDialog::on_list_packet_currentRowChanged(int currentRow)
+{
+    show_detail(currentRow);
 }

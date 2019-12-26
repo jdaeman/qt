@@ -3,9 +3,11 @@
 
 #include "sniffer.h"
 #include "nic.h"
-#include <vector>
+#include "mutex.h"
 
+#include <vector>
 #include <QDialog>
+#include <QMutex>
 
 namespace Ui {
 class SniffDialog;
@@ -41,11 +43,11 @@ private:
     Sniffer sniffer;
     int which;
     std::vector<unsigned char *> pkts;
+    QMutex qm;
 
-    unsigned char * pktss[1000000];
-    int last_pkt;
 
     void clear_pkts();
+    void show_detail(int row);
 };
 
 #endif // SNIFFDIALOG_H

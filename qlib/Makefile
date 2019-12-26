@@ -1,8 +1,9 @@
 
 CC := gcc
 
-SRCS := *.c
+SRCS := sniff.c util.c
 
 defalut : $(SRCS)
 	$(CC) -c $(SRCS)
-	ar rc -o lib*.a *.o	
+	ar rc -o libsniff.a sniff.o
+	ar rc -o libutil.a util.o	

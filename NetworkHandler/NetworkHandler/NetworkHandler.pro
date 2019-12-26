@@ -26,7 +26,8 @@ HEADERS += \
     mainwindow.h \
     nic.h \
     sniffdialog.h \
-    sniffer.h
+    sniffer.h \
+    mutex.h
 
 FORMS += \
     mainwindow.ui \
@@ -51,3 +52,10 @@ INCLUDEPATH += $$PWD/../../qlib
 DEPENDPATH += $$PWD/../../qlib
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libsniff.a
+
+unix:!macx: LIBS += -L$$PWD/../../../../../../usr/lib/x86_64-linux-gnu/ -lcurl
+
+INCLUDEPATH += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu
+DEPENDPATH += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu/libcurl.a

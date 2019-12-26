@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QMutex>
+
+QMutex sniff_mutex;
 
 int main(int argc, char *argv[])
 {

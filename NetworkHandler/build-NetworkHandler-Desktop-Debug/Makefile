@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -m64 -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -m64 -pipe -g -std=c++0x -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../NetworkHandler -I. -I../../qlib -I../../qlib -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64
+INCPATH       = -I../NetworkHandler -I. -I../../qlib -I../../qlib -I/usr/lib/x86_64-linux-gnu -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64
 QMAKE         = /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = NetworkHandler1.0.0
 DISTDIR = /home/rg/workspace/qt/NetworkHandler/build-NetworkHandler-Desktop-Debug/.tmp/NetworkHandler1.0.0
 LINK          = g++
 LFLAGS        = -m64
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -L/home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/ -lutil -lsniff -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -L/home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/ -lutil -lsniff -L/home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../../../../../usr/lib/x86_64-linux-gnu/ -lcurl -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -124,7 +124,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../NetworkHandler/NetworkHandler.pro ../NetworkHandler/mainwindow.h \
 		../NetworkHandler/nic.h \
 		../NetworkHandler/sniffdialog.h \
-		../NetworkHandler/sniffer.h ../NetworkHandler/main.cpp \
+		../NetworkHandler/sniffer.h \
+		../NetworkHandler/mutex.h ../NetworkHandler/main.cpp \
 		../NetworkHandler/mainwindow.cpp \
 		../NetworkHandler/nic.cpp \
 		../NetworkHandler/sniffdialog.cpp \
@@ -156,7 +157,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): /home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/libutil.a /home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/libsniff.a ui_mainwindow.h ui_sniffdialog.h $(OBJECTS)  
+$(TARGET): /home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/libutil.a /home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../qlib/libsniff.a /home/rg/workspace/qt/NetworkHandler/NetworkHandler/../../../../../../usr/lib/x86_64-linux-gnu/libcurl.a ui_mainwindow.h ui_sniffdialog.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../NetworkHandler/NetworkHandler.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -298,7 +299,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../NetworkHandler/mainwindow.h ../NetworkHandler/nic.h ../NetworkHandler/sniffdialog.h ../NetworkHandler/sniffer.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../NetworkHandler/mainwindow.h ../NetworkHandler/nic.h ../NetworkHandler/sniffdialog.h ../NetworkHandler/sniffer.h ../NetworkHandler/mutex.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../NetworkHandler/main.cpp ../NetworkHandler/mainwindow.cpp ../NetworkHandler/nic.cpp ../NetworkHandler/sniffdialog.cpp ../NetworkHandler/sniffer.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../NetworkHandler/mainwindow.ui ../NetworkHandler/sniffdialog.ui $(DISTDIR)/
 
@@ -330,16 +331,18 @@ compiler_moc_header_clean:
 moc_mainwindow.cpp: ../NetworkHandler/sniffdialog.h \
 		../NetworkHandler/sniffer.h \
 		../NetworkHandler/nic.h \
+		../NetworkHandler/mutex.h \
 		../NetworkHandler/mainwindow.h
-	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/lib/x86_64-linux-gnu -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/mainwindow.h -o moc_mainwindow.cpp
 
 moc_sniffdialog.cpp: ../NetworkHandler/sniffer.h \
 		../NetworkHandler/nic.h \
+		../NetworkHandler/mutex.h \
 		../NetworkHandler/sniffdialog.h
-	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/sniffdialog.h -o moc_sniffdialog.cpp
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/lib/x86_64-linux-gnu -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/sniffdialog.h -o moc_sniffdialog.cpp
 
 moc_sniffer.cpp: ../NetworkHandler/sniffer.h
-	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/sniffer.h -o moc_sniffer.cpp
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/rg/workspace/qt/NetworkHandler/NetworkHandler -I/home/rg/workspace/qt/qlib -I/home/rg/workspace/qt/qlib -I/usr/lib/x86_64-linux-gnu -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../NetworkHandler/sniffer.h -o moc_sniffer.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -365,13 +368,15 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 main.o: ../NetworkHandler/main.cpp ../NetworkHandler/mainwindow.h \
 		../NetworkHandler/sniffdialog.h \
 		../NetworkHandler/sniffer.h \
-		../NetworkHandler/nic.h
+		../NetworkHandler/nic.h \
+		../NetworkHandler/mutex.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../NetworkHandler/main.cpp
 
 mainwindow.o: ../NetworkHandler/mainwindow.cpp ../NetworkHandler/mainwindow.h \
 		../NetworkHandler/sniffdialog.h \
 		../NetworkHandler/sniffer.h \
 		../NetworkHandler/nic.h \
+		../NetworkHandler/mutex.h \
 		ui_mainwindow.h \
 		../../qlib/util.h \
 		../../qlib/sniff.h
@@ -384,6 +389,7 @@ nic.o: ../NetworkHandler/nic.cpp ../NetworkHandler/nic.h \
 sniffdialog.o: ../NetworkHandler/sniffdialog.cpp ../NetworkHandler/sniffdialog.h \
 		../NetworkHandler/sniffer.h \
 		../NetworkHandler/nic.h \
+		../NetworkHandler/mutex.h \
 		ui_sniffdialog.h \
 		../../qlib/sniff.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sniffdialog.o ../NetworkHandler/sniffdialog.cpp

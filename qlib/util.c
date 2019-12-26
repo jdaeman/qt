@@ -8,6 +8,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include <curl/curl.h>
+
 #define NETLINK_BUFSIZE 4096
 
 int get_domain_ip(const char * domain, unsigned int * als, int len)
@@ -341,3 +343,27 @@ err:
 	
 	return vendor;
 }*/	
+
+
+size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
+{
+    //printf("%s\n", ptr);
+    //qDebug() << size * nmemb << endl << endl;
+
+    return size * nmemb;
+}
+
+void testtest()
+{
+    CURL * ctx = curl_easy_init();
+
+    curl_easy_setopt(ctx, CURLOPT_URL, "http://ip-api.com/line/24.48.0.1");
+    //curl_easy_setopt(ctx, CURLOPT_WRITEDATA, pkt1);
+    curl_easy_setopt(ctx, CURLOPT_WRITEFUNCTION, write_callback);
+
+    const CURLcode rc = curl_easy_perform(ctx);
+    if (rc != CURLE_OK)
+        return;
+    else
+        return;
+}

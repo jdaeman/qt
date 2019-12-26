@@ -9,16 +9,23 @@ Sniffer::Sniffer()
 
 void Sniffer::run()
 {
-    unsigned char buf[65536];
+    unsigned char buf[1514]; //Normal MTU + Ethernet header size
+    unsigned char * cpy;
+    int len;
 
     while (true)
     {
-        int len = sniff(buf, 1514);
+        memset(buf, 0, sizeof(buf));
+        len = sniff(buf, 1514);
 
         if (len <= 0)
             continue;
 
-        emit capture(buf, len, NULL);
+        //Synchronization with sniffdialog
+        cpy = new unsigned char[len];
+        memcpy(cpy, buf, len);
+
+        emit capture(cpy, len, NULL);
     }
 }
 

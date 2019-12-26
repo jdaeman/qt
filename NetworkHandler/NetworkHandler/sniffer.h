@@ -4,6 +4,9 @@
 #include <QThread>
 #include <QObject>
 
+//#include "mutex.h"
+//#include <QMutex>
+
 class Sniffer : public QThread
 {
     Q_OBJECT
