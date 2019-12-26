@@ -57,15 +57,17 @@ int set_dev_promisc(int sock, int ifindex)
 
 int sniff(unsigned char * buff, int buff_len)
 {
-	int len = recvfrom(sniffer, buff, buff_len - 1, 0, NULL, NULL);	
+	int len;	
 	int off;
 	struct ethhdr * eth;
 	struct iphdr * ip;
 
+	//memset(buff, 0, buff_len);
+	len = recvfrom(sniffer, buff, buff_len, 0, NULL, NULL);
+
 	if (len <= 0)
 		return -errno;
 
-	buff[len] = 0;	
 	return len; 
 }
 
