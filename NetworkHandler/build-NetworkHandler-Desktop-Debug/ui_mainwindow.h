@@ -13,7 +13,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
@@ -34,6 +36,9 @@ public:
     QPushButton *push_public;
     QPushButton *push_sniff;
     QPushButton *pushButton;
+    QLineEdit *lineEdit;
+    QPushButton *pushButton_2;
+    QCheckBox *checkBox;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -61,7 +66,16 @@ public:
         push_sniff->setGeometry(QRect(0, 140, 531, 27));
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(170, 300, 99, 27));
+        pushButton->setGeometry(QRect(140, 360, 99, 27));
+        lineEdit = new QLineEdit(centralwidget);
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setGeometry(QRect(540, 10, 113, 27));
+        pushButton_2 = new QPushButton(centralwidget);
+        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
+        pushButton_2->setGeometry(QRect(540, 70, 111, 41));
+        checkBox = new QCheckBox(centralwidget);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+        checkBox->setGeometry(QRect(580, 40, 21, 22));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QStringLiteral("menubar"));
@@ -85,7 +99,9 @@ public:
 "Public IP\n"
 "", 0));
         push_sniff->setText(QApplication::translate("MainWindow", "Packet Capture", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "IP Location", 0));
+        pushButton_2->setText(QApplication::translate("MainWindow", "ARP Manager", 0));
+        checkBox->setText(QString());
     } // retranslateUi
 
 };
