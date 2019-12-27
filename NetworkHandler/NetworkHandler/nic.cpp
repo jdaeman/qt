@@ -5,8 +5,10 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 
+#include <QDebug>
 #include "nic.h"
 #include "util.h"
+#include "route.h"
 
 static struct nic nics[8];
 
@@ -25,6 +27,7 @@ int init_nic(void)
     if(sock < 0)
         return -1;
 
+    route_init();
     for(itf = if_arr; itf->if_index != 0 || itf->if_name != NULL; itf++)
     {
         nics[cnt].index = itf->if_index;
@@ -32,7 +35,8 @@ int init_nic(void)
 
         strcpy(ifr.ifr_name, itf->if_name);
 
-        ioctl(sock, SIOCGIFADDR, &ifr); //get interface ip
+        if (ioctl(sock, SIOCGIFADDR, &ifr) < 0) //get interface ip
+            goto not_assigned;
         saddr = (struct sockaddr_in *)(&ifr.ifr_addr);
         nics[cnt].ip = saddr->sin_addr.s_addr;
 
@@ -46,8 +50,9 @@ int init_nic(void)
         ioctl(sock, SIOCGIFMTU, &ifr);
         nics[cnt].mtu = ifr.ifr_mtu;
 
-        get_gw_info(itf->if_index, &nics[cnt].route, nics[cnt].neigh);
-
+        default_route_lookup(nics[cnt].ip, nics[cnt].subnet,
+                             &nics[cnt].route, nics[cnt].neigh);
+not_assigned:
         cnt++;
     }
 

@@ -27,6 +27,8 @@ static unsigned int subnet;
 static unsigned char snd_mac[6];
 static unsigned char * alive_table[HOST_NR];
 
+typedef void (*user_func)(unsigned int, unsigned char *);
+
 static void dealloc_table(void)
 {
 	int cnt;
@@ -126,6 +128,8 @@ void * reply_handle(void * arg)
 	unsigned char buf[BUF_SIZE], * ptr;
 	struct arphdr * arp;
 
+	user_func uf = (user_func)arg;
+
 	while (1)
 	{
 		int len = recvfrom(rcv_sock, buf, BUF_SIZE, 0, NULL, NULL);
@@ -150,7 +154,11 @@ void * reply_handle(void * arg)
 			continue;
 
 		alive_table[nr] = (unsigned char *)malloc(6);
-		printf("%d\n", nr);
+
+		if (uf)
+			uf(*(unsigned int *)ptr, ptr - 6);
+		else
+			printf("%d\n", nr);
 
 		//get_vendor(vendor, ptr - 6);
 		//printf("%s\t[%s]\t[%s]\n", 
@@ -163,9 +171,9 @@ void * reply_handle(void * arg)
 	return NULL;
 }
 
-int scanning(int end)
+int scanning(int start, int end, void (func)(unsigned int, unsigned char *))
 {
-	unsigned int host = 1;
+	unsigned int host = start;
 	unsigned int network_addr = snd_ip & subnet;
 
 	unsigned char buf[BUF_SIZE];
@@ -183,7 +191,7 @@ int scanning(int end)
 	device.sll_halen = ETH_ALEN;
 	memset(device.sll_addr, 0xff, 6); //broadcast
 	
-	pthread_create(&tid, NULL, reply_handle, NULL);
+	pthread_create(&tid, NULL, reply_handle, func);
 
 	while (host <= end)
 	{
@@ -203,21 +211,27 @@ int scanning(int end)
 	return 0;
 }
 
-int main()
+
+void aaa(unsigned int ip, unsigned char * mac)
 {
-	unsigned char zz[] = {0x00, 0x0c, 0x29, 0xcd, 0x6f, 0xad};
-	if (arp_init(2, inet_addr("192.168.0.7"), inet_addr("255.255.255.0"), zz) < 0)
+	printf("called\n");
+}
+
+/*int main()
+{
+	unsigned char zz[] = {0x7c, 0x7a, 0x91, 0x35, 0x80, 0x95};
+	if (arp_init(3, inet_addr("192.168.25.95"), inet_addr("255.255.255.0"), zz) < 0)
 	{	
 		printf("ZZ\n");
 		return -1;
 	}
 
-	scanning(128);
+	scanning(0, 255, aaa);
 
 	arp_exit();
 
 	return 0;
-}
+}*/
 
 /*void * spoof_unit(void * arg)
 {	

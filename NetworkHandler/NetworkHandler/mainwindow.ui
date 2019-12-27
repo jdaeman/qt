@@ -99,30 +99,17 @@ Public IP
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="push_arp">
     <property name="geometry">
      <rect>
       <x>540</x>
-      <y>70</y>
+      <y>50</y>
       <width>111</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>ARP Manager</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>40</y>
-      <width>21</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
     </property>
    </widget>
   </widget>

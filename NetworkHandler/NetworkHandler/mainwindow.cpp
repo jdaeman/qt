@@ -4,11 +4,14 @@
 #include "nic.h"
 #include "util.h"
 #include "sniff.h"
+#include "arp.h"
 
 #include <QDebug>
 #include <QMessageBox>
 #include <string.h>
-#include <curl/curl.h>
+
+//#include <curl/curl.h>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,6 +34,7 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
     struct nic * nic = get_nic(idx);
     which = idx;
 
+    qDebug() << nic->index;
     ui->text_nic_info->clear();
     qstr.sprintf("IP\t%s", inet_ntoa_e(nic->ip));
     ui->text_nic_info->append(qstr);
@@ -117,4 +121,30 @@ size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
 void MainWindow::on_pushButton_clicked()
 {
    testtest();
+}
+
+void MainWindow::on_push_arp_clicked()
+{
+    int ret;
+    QMessageBox mbox;
+
+    mbox.setWindowTitle("OOPS");
+    if (which < 0)
+    {
+        mbox.setText("Check interface");
+        mbox.exec();
+        return;
+    }
+
+    struct nic * nic = get_nic(which);
+    ret = arp_init(nic->index, nic->ip, nic->subnet, nic->mac);
+    if (ret < 0)
+    {
+        mbox.setText(strerror(-ret));
+        mbox.exec();
+        return;
+    }
+
+    qDebug() << "Implemting";
+    arp_exit();
 }

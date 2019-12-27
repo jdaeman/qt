@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    arpdialog.cpp \
+    arpmanager.cpp \
     main.cpp \
     mainwindow.cpp \
     nic.cpp \
@@ -23,6 +25,8 @@ SOURCES += \
     sniffer.cpp
 
 HEADERS += \
+    arpdialog.h \
+    arpmanager.h \
     mainwindow.h \
     nic.h \
     sniffdialog.h \
@@ -30,6 +34,7 @@ HEADERS += \
     mutex.h
 
 FORMS += \
+    arpdialog.ui \
     mainwindow.ui \
     sniffdialog.ui
 
@@ -53,9 +58,23 @@ DEPENDPATH += $$PWD/../../qlib
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libsniff.a
 
-unix:!macx: LIBS += -L$$PWD/../../../../../../usr/lib/x86_64-linux-gnu/ -lcurl
+#unix:!macx: LIBS += -L$$PWD/../../../../../../usr/lib/x86_64-linux-gnu/ -lcurl
 
 INCLUDEPATH += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu
 DEPENDPATH += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu/libcurl.a
+#unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../../../usr/lib/x86_64-linux-gnu/libcurl.a
+
+unix:!macx: LIBS += -L$$PWD/../../qlib/ -larp
+
+INCLUDEPATH += $$PWD/../../qlib
+DEPENDPATH += $$PWD/../../qlib
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libarp.a
+
+unix:!macx: LIBS += -L$$PWD/../../qlib/ -lroute
+
+INCLUDEPATH += $$PWD/../../qlib
+DEPENDPATH += $$PWD/../../qlib
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../qlib/libroute.a

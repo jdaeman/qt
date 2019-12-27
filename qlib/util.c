@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#include <curl/curl.h>
+//#include <curl/curl.h>
 
 #define NETLINK_BUFSIZE 4096
 
@@ -355,7 +355,7 @@ size_t write_callback(char * ptr, size_t size, size_t nmemb, void * userdata)
 
 void testtest()
 {
-    CURL * ctx = curl_easy_init();
+    /*CURL * ctx = curl_easy_init();
 
     curl_easy_setopt(ctx, CURLOPT_URL, "http://ip-api.com/line/24.48.0.1");
     //curl_easy_setopt(ctx, CURLOPT_WRITEDATA, pkt1);
@@ -365,5 +365,5 @@ void testtest()
     if (rc != CURLE_OK)
         return;
     else
-        return;
+        return;*/
 }
