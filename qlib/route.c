@@ -11,28 +11,33 @@
 
 #define NETLINK_BUFSIZE 4096
 
-#define AA
+#define NR_NIC 32
 
 struct gateway
 {
+	int index;
 	unsigned int route;
 	unsigned char neigh[6];
 };
 
-static struct gateway * table[8];
+static struct gateway * table[NR_NIC];
 static int count;
 
-static unsigned char * neigh_lookup(int address)
+static int neigh_lookup(int ifindex, int address)
 {
 	int cnt = 0;
-
 	for (; cnt < count; cnt++)
 	{
-		if (table[cnt]->route == address)
-			return table[cnt]->neigh;
+		if (table[cnt]->index == ifindex)
+		{
+			if (!address)
+				return cnt;
+			if (table[cnt]->route == address)
+				return cnt;
+		}
 	}
 
-	return NULL;
+	return -1;
 }
 
 static int send_req(int nl_sock, int type, int * nlseq)
@@ -85,8 +90,9 @@ static void parse_route(struct nlmsghdr * nlmsg)
 {
 	struct rtmsg * rtmsg;
 	struct rtattr * attr;
-	unsigned int ip;
 	int len;
+	unsigned int ip = 0;
+	int ifindex = -1;
 	
 	rtmsg = (struct rtmsg *)(NLMSG_DATA(nlmsg));
 	//Not IPv4 or Not Main routing table
@@ -98,31 +104,35 @@ static void parse_route(struct nlmsghdr * nlmsg)
 
 	for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len))
 	{
-		if (attr->rta_type != RTA_GATEWAY)
-			continue;
-
-		ip = *(unsigned int *)(RTA_DATA(attr));
-
-		if (count >= 8)
-			return;
-
-		table[count] = malloc(sizeof(struct gateway));
-		table[count++]->route = ip;
+		if (attr->rta_type == RTA_OIF) //Output InterFace index
+			ifindex = *(int *)RTA_DATA(attr);
+		if (attr->rta_type == RTA_GATEWAY) // The GATEWAY of the route
+			ip = *(unsigned int *)RTA_DATA(attr);
 	}
+
+	if (ifindex < 0)
+		return;
+	if (count >= NR_NIC)
+		return;
+
+	table[count] = malloc(sizeof(struct gateway));
+	table[count]->index = ifindex;
+	table[count++]->route = ip;
 }
 
 static void parse_neigh(struct nlmsghdr * nlmsg)
 {
 	struct ndmsg * ndmsg;
 	struct rtattr * attr;
-	int len;
+	int len, ifindex, off = -1;
 	unsigned int ip;
-	unsigned char * ptr;
+	unsigned char ptr[6];
 
 	ndmsg = (struct ndmsg *)(NLMSG_DATA(nlmsg));
 	if (ndmsg->ndm_family != PF_INET)
 		return;
 
+	ifindex = ndmsg->ndm_ifindex;
 	attr = (struct rtattr *)(RTM_RTA(ndmsg));
 	len = RTM_PAYLOAD(nlmsg);
 
@@ -132,15 +142,17 @@ static void parse_neigh(struct nlmsghdr * nlmsg)
 		{
 			memcpy(ptr, RTA_DATA(attr), 6);
 		}
-		else if (attr->rta_type == NDA_DST) //DeSTinsation
+		if (attr->rta_type == NDA_DST) //DeSTinsation
 		{
 			ip = *(unsigned int *)(RTA_DATA(attr));
-			if (!(ptr = neigh_lookup(ip)))
+			if ((off = neigh_lookup(ifindex, ip)) < 0)
 				return;
 		}
-		else
-			return;
 	}
+
+	if (off < 0)
+		return;
+	memcpy(table[off]->neigh, ptr, 6);
 }
 
 static void parse_rep(unsigned char * buf, int tot_len,
@@ -210,22 +222,17 @@ void route_exit(void)
 	table_clear();
 }
 
-int default_route_lookup(unsigned int ip, unsigned int subnet, unsigned int * route, unsigned char * neigh)
-{
-	int cnt = 0;
-	unsigned int host_network = ip & subnet;
+int default_route_lookup(int ifindex, unsigned int * route, unsigned char * neigh)
+{	
+	int off = neigh_lookup(ifindex, 0);
+	
+	if (off < 0)
+		return -512;
 
-	for (; cnt < count; cnt++)
-	{
-		if (host_network != ((table[cnt]->route) & subnet)) //Careful, operation priority
-			continue;
-
-		if (route)
-			memcpy(route, &table[cnt]->route, 4);
-		if (neigh)
-			memcpy(neigh, table[cnt]->neigh, 6);
-		return 0;
-	}
-
-	return -512;
+	if (route)
+		memcpy(route, &table[off]->route, 4);
+	if (neigh)
+		memcpy(neigh, table[off]->neigh, 6);
+	return 0;
 }
+

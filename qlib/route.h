@@ -9,7 +9,7 @@ extern "C"
 int route_init(void);
 void route_exit(void);
 
-int default_route_lookup(unsigned int ip, unsigned int subnet, unsigned int * route, unsigned char * neigh);
+int default_route_lookup(int ifindex, unsigned int * route, unsigned char * neigh);
 
 
 #ifdef __cplusplus

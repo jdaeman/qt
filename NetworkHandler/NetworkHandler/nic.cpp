@@ -50,8 +50,8 @@ int init_nic(void)
         ioctl(sock, SIOCGIFMTU, &ifr);
         nics[cnt].mtu = ifr.ifr_mtu;
 
-        default_route_lookup(nics[cnt].ip, nics[cnt].subnet,
-                             &nics[cnt].route, nics[cnt].neigh);
+        default_route_lookup(nics[cnt].index, &nics[cnt].route, nics[cnt].neigh);
+
 not_assigned:
         cnt++;
     }

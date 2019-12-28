@@ -52,6 +52,7 @@ void MainWindow::on_list_nic_clicked(const QModelIndex &index)
 
 void MainWindow::on_push_nic_reset_clicked()
 {
+    ui->text_nic_info->clear();
     ui->list_nic->clear();
     which = -1;
 
