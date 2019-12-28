@@ -11,7 +11,6 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
@@ -32,7 +31,6 @@ public:
     QPushButton *push_public;
     QPushButton *push_sniff;
     QPushButton *pushButton;
-    QLineEdit *lineEdit;
     QPushButton *push_arp;
     QMenuBar *menubar;
     QStatusBar *statusbar;
@@ -62,12 +60,9 @@ public:
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
         pushButton->setGeometry(QRect(140, 360, 99, 27));
-        lineEdit = new QLineEdit(centralwidget);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        lineEdit->setGeometry(QRect(540, 10, 113, 27));
         push_arp = new QPushButton(centralwidget);
         push_arp->setObjectName(QString::fromUtf8("push_arp"));
-        push_arp->setGeometry(QRect(540, 50, 111, 41));
+        push_arp->setGeometry(QRect(0, 180, 111, 41));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));

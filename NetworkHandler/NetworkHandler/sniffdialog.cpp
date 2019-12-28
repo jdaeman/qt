@@ -15,6 +15,16 @@ SniffDialog::SniffDialog(QWidget *parent) :
     ui->push_start->setEnabled(true);
     ui->push_stop->setEnabled(false);
 
+    //
+    QPixmap pm("/root/workspace/qt/NetworkHandler/NetworkHandler/image/Arrow-Up.png");
+    QIcon ic(pm);
+
+    qDebug() << pm.isNull();
+
+    ui->pushButton->setIcon(ic);
+    ui->pushButton->setIconSize({15, 15});
+    //
+
     connect(&sniffer, SIGNAL(capture(unsigned char *, int, void *)),
             this, SLOT(capture(unsigned char *, int, void *)));
 }
@@ -70,7 +80,6 @@ void SniffDialog::capture(unsigned char *buf, int len, void *arg)
     pkts.push_back(buf);
 
     ui->list_packet->addItem(tmp);
-    ui->list_packet->scrollToBottom();
 }
 
 void SniffDialog::on_edit_filter_editingFinished()

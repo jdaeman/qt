@@ -28,7 +28,7 @@ public:
         ArpDialog->resize(662, 652);
         list_host = new QListWidget(ArpDialog);
         list_host->setObjectName(QString::fromUtf8("list_host"));
-        list_host->setGeometry(QRect(10, 20, 611, 201));
+        list_host->setGeometry(QRect(0, 10, 611, 201));
 
         retranslateUi(ArpDialog);
 

@@ -27,12 +27,13 @@ public:
     QPushButton *push_start;
     QPushButton *push_stop;
     QTextBrowser *text_detail;
+    QPushButton *pushButton;
 
     void setupUi(QDialog *SniffDialog)
     {
         if (SniffDialog->objectName().isEmpty())
             SniffDialog->setObjectName(QString::fromUtf8("SniffDialog"));
-        SniffDialog->resize(644, 664);
+        SniffDialog->resize(694, 664);
         edit_filter = new QLineEdit(SniffDialog);
         edit_filter->setObjectName(QString::fromUtf8("edit_filter"));
         edit_filter->setGeometry(QRect(10, 40, 610, 27));
@@ -50,6 +51,9 @@ public:
         text_detail = new QTextBrowser(SniffDialog);
         text_detail->setObjectName(QString::fromUtf8("text_detail"));
         text_detail->setGeometry(QRect(10, 280, 610, 371));
+        pushButton = new QPushButton(SniffDialog);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setGeometry(QRect(630, 70, 51, 31));
 
         retranslateUi(SniffDialog);
 
@@ -61,6 +65,7 @@ public:
         SniffDialog->setWindowTitle(QApplication::translate("SniffDialog", "Dialog", nullptr));
         push_start->setText(QApplication::translate("SniffDialog", "Start", nullptr));
         push_stop->setText(QApplication::translate("SniffDialog", "Stop", nullptr));
+        pushButton->setText(QString());
     } // retranslateUi
 
 };

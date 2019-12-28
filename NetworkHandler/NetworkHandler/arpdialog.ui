@@ -16,8 +16,8 @@
   <widget class="QListWidget" name="list_host">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
+     <x>0</x>
+     <y>10</y>
      <width>611</width>
      <height>201</height>
     </rect>

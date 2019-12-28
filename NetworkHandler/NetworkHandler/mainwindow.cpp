@@ -146,6 +146,7 @@ void MainWindow::on_push_arp_clicked()
         return;
     }
 
-    qDebug() << "Implemting";
+    ArpDialog ad;
+    ad.exec();
     arp_exit();
 }
