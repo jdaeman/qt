@@ -17,12 +17,14 @@ SniffDialog::SniffDialog(QWidget *parent) :
 
     //
     QPixmap pm("/root/workspace/qt/NetworkHandler/NetworkHandler/image/Arrow-Up.png");
+    QPixmap pm1("/root/workspace/qt/NetworkHandler/NetworkHandler/image/Arrow-Down.png");
     QIcon ic(pm);
+    QIcon ic1(pm1);
 
-    qDebug() << pm.isNull();
-
-    ui->pushButton->setIcon(ic);
-    ui->pushButton->setIconSize({15, 15});
+    ui->push_top->setIcon(ic);
+    ui->push_bot->setIcon(ic1);
+    ui->push_top->setIconSize({15, 15});
+    ui->push_bot->setIconSize({15, 15});
     //
 
     connect(&sniffer, SIGNAL(capture(unsigned char *, int, void *)),
@@ -145,4 +147,14 @@ void SniffDialog::show_detail(int row)
 void SniffDialog::on_list_packet_currentRowChanged(int currentRow)
 {
     show_detail(currentRow);
+}
+
+void SniffDialog::on_push_bot_clicked()
+{
+    ui->list_packet->scrollToBottom();
+}
+
+void SniffDialog::on_push_top_clicked()
+{
+    ui->list_packet->scrollToTop();
 }

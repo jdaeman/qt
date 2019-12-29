@@ -38,6 +38,10 @@ private slots:
 
     void on_list_packet_currentRowChanged(int currentRow);
 
+    void on_push_bot_clicked();
+
+    void on_push_top_clicked();
+
 private:
     Ui::SniffDialog *ui;
     Sniffer sniffer;
